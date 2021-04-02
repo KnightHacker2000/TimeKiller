@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
     String userId;
+    Double latitude = 47.6550;
+    Double longitude = -122.3080;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         email = findViewById(R.id.emailText);
         highScore = findViewById(R.id.high_score);
         resetNickmame = findViewById(R.id.reset_nickname);
+
         //FirebaseApp.initializeApp(this);
 
         fAuth = FirebaseAuth.getInstance();
