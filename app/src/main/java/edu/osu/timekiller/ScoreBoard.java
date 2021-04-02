@@ -188,10 +188,10 @@ public class ScoreBoard extends AppCompatActivity implements
 //                            Log.d(TAG,"Last Location:"+lastKnownLocation.getLatitude()+","+
 //                                    lastKnownLocation.getLongitude());
                             if (lastKnownLocation != null) {
+                                UpdateUserLocation.updateUserLocation(lastKnownLocation);
                                 Log.d(TAG, "Location not Null!");
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(lastKnownLocation.getLatitude(),
-                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                        new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                             }
 
                         } else{
@@ -207,4 +207,5 @@ public class ScoreBoard extends AppCompatActivity implements
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
+
 }
