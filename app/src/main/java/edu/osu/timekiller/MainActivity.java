@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,7 +17,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,6 +31,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private Button mShowScroeBoard; // Button to show Top Players Activity
+    private Button playGame;
     public static final String TAG = Register.class.getName();
 
     TextView nickName, email, highScore,resetNickmame;
@@ -144,11 +145,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        // Get the PlayGame Button Resource, Create an Intent to start the PlayGame Activity
+        playGame = findViewById(R.id.button_play_game);
+        playGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(v.getId()==R.id.button_play_game){
+                    Intent intent = new Intent(MainActivity.this, TouchActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
         public void logout(View view){
             FirebaseAuth.getInstance().signOut();
             Intent myIntent = new Intent(MainActivity.this, Login.class);
-            MainActivity.this.startActivity(myIntent);
+            startActivity(myIntent);
             finish();
         }
 
