@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -30,20 +29,23 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.List;
 
 public class ScoreBoard extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
@@ -59,7 +61,7 @@ public class ScoreBoard extends AppCompatActivity implements
     private boolean permissionDenied = false;
     private boolean locationPermissionGranted = false;
     private GoogleMap map;
-
+    private Location lastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,7 @@ public class ScoreBoard extends AppCompatActivity implements
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         getDeviceLocation();
+        //map.setOnCameraIdleListener(this);
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
         enableMyLocation();
@@ -157,7 +160,7 @@ public class ScoreBoard extends AppCompatActivity implements
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
-            Log.d(TAG,"Location Permission Granted");
+            Log.d(TAG, "Location Permission Granted");
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -173,7 +176,7 @@ public class ScoreBoard extends AppCompatActivity implements
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        Log.d(TAG,"getDeviceLocationRunning");
+        Log.d(TAG, "getDeviceLocationRunning");
         getLocationPermission();
         try {
             if (locationPermissionGranted) {
@@ -184,17 +187,22 @@ public class ScoreBoard extends AppCompatActivity implements
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
-                            Location lastKnownLocation = task.getResult();
+                            lastKnownLocation = task.getResult();
 //                            Log.d(TAG,"Last Location:"+lastKnownLocation.getLatitude()+","+
 //                                    lastKnownLocation.getLongitude());
                             if (lastKnownLocation != null) {
-                                UpdateUserLocation.updateUserLocation(lastKnownLocation);
+
+                                UpdateUserLocation.updateUserLocation(lastKnownLocation, getApplicationContext());
                                 Log.d(TAG, "Location not Null!");
-                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+                                showTopPlayers();
+
+
                             }
 
-                        } else{
+
+                        } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             map.moveCamera(CameraUpdateFactory
@@ -203,9 +211,49 @@ public class ScoreBoard extends AppCompatActivity implements
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
 
+    public void showTopPlayers() {
+
+        VisibleRegion viewPort = map.getProjection().getVisibleRegion();
+        LatLngBounds viewBound = viewPort.latLngBounds;
+
+        LatLng northeast = viewBound.northeast; // test bound
+        LatLng southwest = viewBound.southwest; // test bound
+
+//        Log.d(TAG,"northeast bound: "+northeast.latitude+", "+northeast.latitude);
+//        Log.d(TAG,"southwest bound: "+southwest.latitude+", "+southwest.latitude);
+//
+//        map.addMarker(new MarkerOptions()
+//                .position(southwest)
+//                .title("southwest")
+//        ).setTag(0);
+//
+//        map.addMarker(new MarkerOptions()
+//                .position(northeast)
+//                .title("northeast")
+//        ).setTag(0);
+
+        List<Pair<LatLng, Integer>> scoreList = GetTopPlayers.getTopPlayers(viewBound, lastKnownLocation, getApplicationContext());
+        //Log.d(TAG,"list size = "+scoreList.size());
+
+        for (int i = 0; i < scoreList.size(); i++) {
+            map.addMarker(new MarkerOptions()
+                    .position(scoreList.get(i).first)
+                    .title(String.valueOf(i + 1))
+            ).setTag(0);
+            Log.d(TAG,"added marker");
+        }
+
+
+        //Log.d(TAG, "add marker!");
+
+    }
+
+
 }
+
+
