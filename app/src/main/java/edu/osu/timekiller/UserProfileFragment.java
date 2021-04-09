@@ -1,19 +1,21 @@
 package edu.osu.timekiller;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,55 +25,46 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.Inflater;
 
-public class MainActivity extends AppCompatActivity {
+public class UserProfileFragment extends Fragment {
 
-    private Button mShowScroeBoard; // Button to show Top Players Activity
-    private Button playGame;
+
     public static final String TAG = Register.class.getName();
-
     TextView nickName, email, highScore,resetNickmame;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
     String userId;
 
+    public UserProfileFragment() {
+        // Required empty public constructor
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
 
-        nickName = findViewById(R.id.nickName_text);
-        email = findViewById(R.id.emailText);
-        highScore = findViewById(R.id.high_score);
-        resetNickmame = findViewById(R.id.reset_nickname);
+        nickName = view.findViewById(R.id.nickName_text);
+        email = view.findViewById(R.id.emailText);
+        highScore = view.findViewById(R.id.high_score);
+        resetNickmame = view.findViewById(R.id.reset_nickname);
 
-        //FirebaseApp.initializeApp(this);
+        // From MainActivity
 
         fAuth = FirebaseAuth.getInstance();
-        if(fAuth.getCurrentUser() == null){
-            Intent myIntent = new Intent(MainActivity.this, Login.class);
-            MainActivity.this.startActivity(myIntent);
-        }
-        else{
+        if(fAuth.getCurrentUser() != null){
+
             fStore = FirebaseFirestore.getInstance();
             userId = fAuth.getCurrentUser().getUid();
             DocumentReference documentReference = fStore.collection(("Information")).document(userId);
 
-            if(documentReference == null){
-                FirebaseAuth.getInstance().signOut();
-                Intent myIntent = new Intent(MainActivity.this, Login.class);
-                MainActivity.this.startActivity(myIntent);
-                finish();
-            }
 
-            Log.d("documentReference", documentReference.toString());
-
-            documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+            documentReference.addSnapshotListener(getActivity(), new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                     if(fAuth.getCurrentUser() != null) {
@@ -104,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                         String newNickname = resetText.getText().toString();
 
                         if(newNickname.length() <= 0){
-                            Toast.makeText(MainActivity.this, "The nickname cannot be empty", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "The nickname cannot be empty", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
@@ -135,36 +128,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Get the ScoreBoard Button Resource, Create an Intent to start ScoreBoard Activity
-        mShowScroeBoard = findViewById(R.id.button_show_score_board);
-
-        mShowScroeBoard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(view.getId() == R.id.button_show_score_board){
-                    Intent intent = new Intent(MainActivity.this, ScoreBoard.class);
-                    startActivity(intent);
-                }
-            }
-        });
-        // Get the PlayGame Button Resource, Create an Intent to start the PlayGame Activity
-        playGame = findViewById(R.id.button_play_game);
-        playGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(v.getId()==R.id.button_play_game){
-                    Intent intent = new Intent(MainActivity.this, TouchActivity.class);
-                    //Intent intent = new Intent(MainActivity.this, Background.class);
-                    startActivity(intent);
-                }
-            }
-        });
+        return view;
     }
-        public void logout(View view){
-            FirebaseAuth.getInstance().signOut();
-            Intent myIntent = new Intent(MainActivity.this, Login.class);
-            startActivity(myIntent);
-            finish();
-        }
 
+    public void logout(View view){
+        FirebaseAuth.getInstance().signOut();
+        Intent myIntent = new Intent(getActivity(), Login.class);
+        startActivity(myIntent);
+        //finish();
     }
+}

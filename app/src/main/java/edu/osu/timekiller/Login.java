@@ -89,7 +89,8 @@ public class Login extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(Login.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                            //startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                            startActivity(new Intent(getApplicationContext(),MainActivity2.class));
                         }else {
                             Toast.makeText(Login.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
@@ -173,7 +174,9 @@ public class Login extends AppCompatActivity {
     public void welcome_note(){
 
         // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, ScoreBoard.class);
+        //Intent intent = new Intent(this, ScoreBoard.class);
+        //Intent intent = new Intent(this, Background.class);
+        Intent intent = new Intent(this, MainActivity2.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         createNotificationChannel();

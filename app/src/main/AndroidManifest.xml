@@ -16,9 +16,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TimeKiller">
-        <activity android:name=".TouchActivity"></activity>
+<!--        <activity android:name=".Login" />-->
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity2"></activity>
+
+        <activity android:name=".CreatePost" />
+        <activity
+            android:name=".Background"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:turnScreenOn="true" />
+<!--        <activity android:name=".TouchActivity" />-->
         <activity android:name=".Register" />
-        <activity android:name=".Login" />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -32,7 +42,7 @@
             android:value="@string/google_maps_key" />
 
         <activity android:name=".ScoreBoard" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
