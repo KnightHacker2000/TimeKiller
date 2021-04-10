@@ -5,6 +5,10 @@
     <string name="button_new_event">Create A New HotSpot</string>
     <string name="button_join_event">Join A HotSpot</string>
     <string name="post_category_prompt">I want to find a pal for -- </string>
+    <string name="post_content_prompt">Create your post -- </string>
+    <string name="title_input_label">Title </string>
+    <string name="description_input_label">Description</string>
+    <string name="location_prompt">Choose Event Location -- </string>
 
 
 </resources>

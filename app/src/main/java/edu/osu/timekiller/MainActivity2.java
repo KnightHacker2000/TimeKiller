@@ -2,6 +2,9 @@ package edu.osu.timekiller;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.solver.widgets.ConstraintAnchor;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -12,10 +15,21 @@ import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.firestore.auth.User;
+
+import java.util.Arrays;
 
 import static androidx.fragment.app.FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
 
@@ -27,6 +41,14 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyBsQ-4iMKqnVLLwlzcDN67bR68DdrckFvU");
+        }
+
+        PlacesClient placesClient = Places.createClient(this);
+
+
         bottom_nav_bar = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         Fragment[] frags = new Fragment[3];
         frags[0] = new WorldFragment();
@@ -102,5 +124,6 @@ public class MainActivity2 extends AppCompatActivity {
                 return false;
             }
         });
+
     }
 }
