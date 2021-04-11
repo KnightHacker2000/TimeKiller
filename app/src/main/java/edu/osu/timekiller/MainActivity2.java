@@ -67,7 +67,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         bottom_nav_bar = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         Fragment[] frags = new Fragment[3];
-        frags[0] = new Map_View();
+        frags[0] = new WorldFragment();
         frags[1] = new NewPostFragment();
         frags[2] = new UserProfileFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
