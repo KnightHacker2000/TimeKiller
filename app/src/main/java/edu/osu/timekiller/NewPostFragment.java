@@ -2,8 +2,10 @@ package edu.osu.timekiller;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
@@ -20,6 +22,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -34,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -69,6 +74,8 @@ public class NewPostFragment extends Fragment {
     String userId = fAuth.getCurrentUser().getUid();
     CollectionReference mCollectionReference = fStore.collection("posts");
     Map<String, Object> updateMap = new HashMap<>();
+    String placeID = "";
+    String placeName = "";
 
 
     public NewPostFragment() {
@@ -148,13 +155,17 @@ public class NewPostFragment extends Fragment {
                 public void onPlaceSelected(@NotNull Place place) {
                     Log.d(TAG, "Place: " + place.getName() + ", " + place.getId());
 
+                    placeID = place.getId();
+
                     // Dynamically add the textView
                     locationTextView = view.findViewById(R.id.location_text);
                     int id = View.generateViewId();
                     locationTextView.setText("Event Location: " + place.getName());
+                    placeName = place.getName();
 
                     // Update LatLng
                     post_location = place.getLatLng();
+                    //Location location = new Location()
                 }
 
                 @Override
@@ -179,20 +190,43 @@ public class NewPostFragment extends Fragment {
                         Toast.makeText(getContext(), "Please select location before submitting", Toast.LENGTH_SHORT).show();
                     } else {
 
-                        updateMap.put("title", titleTextView.getText().toString());
-                        updateMap.put("description", contentTextView.getText().toString());
-                        updateMap.put("location_lat", post_location.latitude);
-                        updateMap.put("location_long", post_location.longitude);
-                        updateMap.put("post_category", post_cate);
-                        updateMap.put("user_id", userId);
+                        DocumentReference doc = fStore.collection("information").document(userId);
 
-                        mCollectionReference.document().set(updateMap);
-                        Toast.makeText(getContext(), "Create Post Success", Toast.LENGTH_SHORT).show();
+                        doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
-                        titleTextView.setText("");
-                        contentTextView.setText("");
-                        locationTextView.setText("Location Not Set");
-                        mChipArr[chip_checked_index].setChecked(false);
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    String email = document.getString("email");
+                                    String nickName = document.getString("nickname");
+                                    List<String> participants = new ArrayList<>();
+                                    participants.add(userId);
+                                    updateMap.put("title", titleTextView.getText().toString());
+                                    updateMap.put("description", contentTextView.getText().toString());
+                                    updateMap.put("location_lat", post_location.latitude);
+                                    updateMap.put("location_long", post_location.longitude);
+                                    updateMap.put("post_category", post_cate);
+                                    updateMap.put("user_id", userId);
+                                    updateMap.put("place_id", placeID);
+                                    updateMap.put("place_name", placeName);
+                                    updateMap.put("participants", participants);
+                                    updateMap.put("contact_email", email);
+                                    updateMap.put("contact_name", nickName);
+                                    //updateMap.put("country",)
+
+                                    mCollectionReference.document().set(updateMap);
+                                    Toast.makeText(getContext(), "Create Post Success", Toast.LENGTH_SHORT).show();
+
+                                    titleTextView.setText("");
+                                    contentTextView.setText("");
+                                    locationTextView.setText("Location Not Set");
+                                    mChipArr[chip_checked_index].setChecked(false);
+                                }
+                            }
+                        });
+
+
 
                         //getActivity().getFragmentManager().beginTransaction().remove(this).commit();
                     }

@@ -29,6 +29,7 @@ package edu.osu.timekiller;
         import java.util.HashMap;
         import java.util.List;
         import java.util.Map;
+        import java.util.concurrent.TimeUnit;
 
 public class GetTopPlayers {
 
@@ -36,7 +37,7 @@ public class GetTopPlayers {
     private static final String TAG = "LocationService";
 
     @SuppressLint("NewApi")
-    public static List<Pair<LatLng, Integer>> getTopPlayers(LatLngBounds viewBound, Location lastKnownLocation, Context context) {
+    public static List<Pair<LatLng, Integer>> getTopPlayers(LatLngBounds viewBound, Location lastKnownLocation, Context context) throws InterruptedException {
 
         String[] userAddress = UpdateUserLocation.getUserAddress(context, lastKnownLocation);
 
@@ -46,53 +47,64 @@ public class GetTopPlayers {
         List<DocumentSnapshot> docs = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("Information")
-                .whereEqualTo("country", userAddress[0])
-                .whereEqualTo("subLocality", userAddress[1])
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "Document "+" is received.");
-
-                    int i=0;
-                    for (DocumentSnapshot document : task.getResult()) {
-                        //Log.d(TAG, "Document "+i+" is received.");
-
-                        docs.add(document);
+        db.collection("posts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
-                } else{
-                    Log.d(TAG, "Error getting documents: ", task.getException());
-                }
-            }
-        });
+                });
 
-        Log.d("LocationService","list size = "+docs.size());
+//        db.collection("posts")
+//                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    Log.d(TAG, "Document "+" is received.");
+//
+//                    int i=0;
+//                    for (DocumentSnapshot document : task.getResult()) {
+//                        //Log.d(TAG, "Document "+i+" is received.");
+//
+//                        docs.add(document);
+//                    }
+//                    for(DocumentSnapshot document: docs) {
+//                        LatLng playerLocale = new LatLng(document.getDouble("latitude"), document.getDouble("longitude"));
+//                        Log.d("LocationService", "query success!");
+//
+//                        if (viewBound.contains(playerLocale)) {
+//                            //Log.d("LocationService", "query success!");
+//
+//                            Pair<LatLng, Integer> pair = new Pair<>(playerLocale, Integer.valueOf(document.getString("high_score")));
+//                            Log.d("LocationService", "score = " + document.getString("high_score"));
+//
+//                            scoreList.add(pair);
+//                        }
+//
+//                        scoreList.sort(new Comparator<Pair<LatLng, Integer>>() {
+//                            @Override
+//                            public int compare(Pair<LatLng, Integer> t1, Pair<LatLng, Integer> t2) {
+//                                return t1.second.compareTo(t2.second);
+//                            }
+//                        });
+//
+//                    }
+//                } else{
+//                    Log.d(TAG, "Error getting documents: ", task.getException());
+//                }
+//            }
+//        });
 
-
-        for(DocumentSnapshot document: docs) {
-            LatLng playerLocale = new LatLng(document.getDouble("latitude"), document.getDouble("longitude"));
-            Log.d("LocationService", "query success!");
-
-            if (viewBound.contains(playerLocale)) {
-                //Log.d("LocationService", "query success!");
-
-                Pair<LatLng, Integer> pair = new Pair<>(playerLocale, Integer.valueOf(document.getString("high_score")));
-                Log.d("LocationService", "score = " + document.getString("high_score"));
-
-                scoreList.add(pair);
-            }
-        }
         //Log.d("LocationService","list size = "+scoreList.size());
 
-
-        scoreList.sort(new Comparator<Pair<LatLng, Integer>>() {
-            @Override
-            public int compare(Pair<LatLng, Integer> t1, Pair<LatLng, Integer> t2) {
-                return t1.second.compareTo(t2.second);
-            }
-        });
-
+        TimeUnit.SECONDS.sleep(10);
 
         return scoreList;
 

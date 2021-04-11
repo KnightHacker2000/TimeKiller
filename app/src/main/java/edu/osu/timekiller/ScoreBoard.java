@@ -63,6 +63,8 @@ public class ScoreBoard extends AppCompatActivity implements
     private GoogleMap map;
     private Location lastKnownLocation;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -196,7 +198,11 @@ public class ScoreBoard extends AppCompatActivity implements
                                 Log.d(TAG, "Location not Null!");
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
-                                showTopPlayers();
+                                try {
+                                    showTopPlayers();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
 
 
                             }
@@ -216,7 +222,7 @@ public class ScoreBoard extends AppCompatActivity implements
         }
     }
 
-    public void showTopPlayers() {
+    public void showTopPlayers() throws InterruptedException {
 
         VisibleRegion viewPort = map.getProjection().getVisibleRegion();
         LatLngBounds viewBound = viewPort.latLngBounds;
@@ -224,18 +230,6 @@ public class ScoreBoard extends AppCompatActivity implements
         LatLng northeast = viewBound.northeast; // test bound
         LatLng southwest = viewBound.southwest; // test bound
 
-//        Log.d(TAG,"northeast bound: "+northeast.latitude+", "+northeast.latitude);
-//        Log.d(TAG,"southwest bound: "+southwest.latitude+", "+southwest.latitude);
-//
-//        map.addMarker(new MarkerOptions()
-//                .position(southwest)
-//                .title("southwest")
-//        ).setTag(0);
-//
-//        map.addMarker(new MarkerOptions()
-//                .position(northeast)
-//                .title("northeast")
-//        ).setTag(0);
 
         List<Pair<LatLng, Integer>> scoreList = GetTopPlayers.getTopPlayers(viewBound, lastKnownLocation, getApplicationContext());
         //Log.d(TAG,"list size = "+scoreList.size());
