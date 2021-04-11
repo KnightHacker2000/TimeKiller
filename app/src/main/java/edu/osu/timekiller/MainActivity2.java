@@ -36,6 +36,7 @@ import static androidx.fragment.app.FragmentStatePagerAdapter.BEHAVIOR_RESUME_ON
 public class MainActivity2 extends AppCompatActivity {
     private BottomNavigationView bottom_nav_bar = null;
     private final String TAG = "mainactivity";
+    ViewPager viewPager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +69,7 @@ public class MainActivity2 extends AppCompatActivity {
                 return frags.length;
             }
         };
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 

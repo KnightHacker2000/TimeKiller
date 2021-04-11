@@ -34,14 +34,28 @@ public class UserProfileFragment extends Fragment {
 
 
     public static final String TAG = Register.class.getName();
-    TextView nickName, email, highScore,resetNickmame;
+    TextView nickName, email,resetNickmame,post;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
     String userId;
 
+    DocumentReference documentReference;
+
     public UserProfileFragment() {
         // Required empty public constructor
     }
+
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        fAuth = FirebaseAuth.getInstance();
+        if(fAuth.getCurrentUser() != null){
+            fStore = FirebaseFirestore.getInstance();
+            userId = fAuth.getCurrentUser().getUid();
+            documentReference = fStore.collection(("Information")).document(userId);
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,30 +65,9 @@ public class UserProfileFragment extends Fragment {
 
         nickName = view.findViewById(R.id.nickName_text);
         email = view.findViewById(R.id.emailText);
-        highScore = view.findViewById(R.id.high_score);
         resetNickmame = view.findViewById(R.id.reset_nickname);
 
         // From MainActivity
-
-        fAuth = FirebaseAuth.getInstance();
-        if(fAuth.getCurrentUser() != null){
-
-            fStore = FirebaseFirestore.getInstance();
-            userId = fAuth.getCurrentUser().getUid();
-            DocumentReference documentReference = fStore.collection(("Information")).document(userId);
-
-
-            documentReference.addSnapshotListener(getActivity(), new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if(fAuth.getCurrentUser() != null) {
-                        email.setText(documentSnapshot.getString("email"));
-                        nickName.setText(documentSnapshot.getString("nickname"));
-                        highScore.setText(documentSnapshot.getString("high_score"));
-                    }
-                }
-            });
-        }
 
 
         resetNickmame.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +96,6 @@ public class UserProfileFragment extends Fragment {
 
                         updateMap.put("nickname",newNickname);
                         updateMap.put("email",email.getText().toString());
-                        updateMap.put("high_score", highScore.getText().toString());
                         documentReference.set(updateMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -127,8 +119,19 @@ public class UserProfileFragment extends Fragment {
                 resetDialog.create().show();
             }
         });
-
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                email.setText(documentSnapshot.getString("email"));
+                nickName.setText(documentSnapshot.getString("nickname"));
+            }
+        });
     }
 
     public void logout(View view){
