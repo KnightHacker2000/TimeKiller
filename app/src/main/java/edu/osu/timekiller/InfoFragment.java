@@ -51,6 +51,7 @@ public class InfoFragment extends Fragment {
     private TextView mLocationView = null;
     private TextView mDescriptionView = null;
     private TextView mContactView = null;
+    private TextView mContactPrompt = null;
     private Button mButton = null;
     private Chip mChip = null;
     FirebaseFirestore fStore = FirebaseFirestore.getInstance();
@@ -85,6 +86,7 @@ public class InfoFragment extends Fragment {
         mImageView = view.findViewById(R.id.place_image);
         mTitleView = view.findViewById(R.id.titleField);
         mChip = view.findViewById(R.id.chip);
+        mContactPrompt = view.findViewById(R.id.contact_prompt);
         mDescriptionView = view.findViewById(R.id.descriptionField);
         mLocationView = view.findViewById(R.id.location_text);
         mContactView = view.findViewById(R.id.contactInfo);
@@ -96,7 +98,11 @@ public class InfoFragment extends Fragment {
         doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                Log.d(TAG, "Query Complete: ");
+
                 if (task.isSuccessful()) {
+                    Log.d(TAG, "Query Success: ");
+
                     DocumentSnapshot document = task.getResult();
                     PlacesClient placesClient = Places.createClient(getContext());
                     String placeId = document.getString("place_id");
@@ -105,18 +111,22 @@ public class InfoFragment extends Fragment {
                     mDescriptionView.setText(document.getString("description"));
                     mLocationView.setText(document.getString("place_name"));
                     String post_cate = document.getString("post_category");
-                    if(post_cate == "sport"){
+                    Log.d(TAG, "Post Category: " + post_cate);
+
+                    if(post_cate.compareTo("sport") == 0){
                         mChip.setChipIconResource(R.drawable.outline_fitness_center_24);
                         mChip.setText("Sport");
-                    } else if(post_cate == "transportation"){
+                    } else if(post_cate.compareTo("transportation") == 0){
+                        Log.d(TAG, "Under transport: ");
+
                         mChip.setChipIconResource(R.drawable.outline_drive_eta_24);
                         mChip.setText("Transportation");
 
-                    } else if(post_cate == "academic"){
+                    } else if(post_cate.compareTo("academic") == 0){
                         mChip.setChipIconResource(R.drawable.outline_auto_stories_24);
                         mChip.setText("Academic");
 
-                    }else if(post_cate == "entertainment"){
+                    }else if(post_cate.compareTo("entertainment") == 0){
                         mChip.setChipIconResource(R.drawable.outline_attractions_24);
                         mChip.setText("Entertainment");
 
@@ -126,10 +136,12 @@ public class InfoFragment extends Fragment {
                     String name = document.getString("contact_name");
                     if(participants.contains(userId)){
                         mButton.setEnabled(false);
+                        mContactPrompt.setVisibility(View.VISIBLE);
                         mContactView.setVisibility(View.VISIBLE);
-                        mContactView.setText("nickname: "+name+", Email: "+email);
+                        mContactView.setText("nickname: "+name+","+"\n"+"Email: "+email);
                     } else{
                         mButton.setEnabled(true);
+                        mContactPrompt.setVisibility(View.INVISIBLE);
                         mContactView.setVisibility(View.INVISIBLE);
                     }
                     //mContactView
@@ -165,7 +177,6 @@ public class InfoFragment extends Fragment {
                                 final ApiException apiException = (ApiException) exception;
                                 Log.e(TAG, "Place not found: " + exception.getMessage());
                                 final int statusCode = apiException.getStatusCode();
-                                // TODO: Handle error with given status code.
                             }
                         });
                     });

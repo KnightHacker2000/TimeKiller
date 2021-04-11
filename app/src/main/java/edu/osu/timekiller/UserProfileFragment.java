@@ -1,13 +1,17 @@
 package edu.osu.timekiller;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +30,9 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.Inflater;
 
@@ -128,8 +134,19 @@ public class UserProfileFragment extends Fragment {
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                email.setText(documentSnapshot.getString("email"));
-                nickName.setText(documentSnapshot.getString("nickname"));
+                String email_text = documentSnapshot.getString("email");
+                String nickName_text = documentSnapshot.getString("nickname");
+                email.setText(email_text);
+                nickName.setText(nickName_text);
+
+                List<String> user_info = new ArrayList<>();
+
+                user_info.add(nickName_text);
+                user_info.add(email_text);
+
+                ViewModel viewModel = new ViewModelProvider(getActivity()).get(UserViewModel.class);
+                ((UserViewModel) viewModel).selectItem(user_info);
+
             }
         });
     }
@@ -138,6 +155,5 @@ public class UserProfileFragment extends Fragment {
         FirebaseAuth.getInstance().signOut();
         Intent myIntent = new Intent(getActivity(), Login.class);
         startActivity(myIntent);
-        //finish();
     }
 }

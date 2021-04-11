@@ -8,8 +8,12 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -29,7 +33,9 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.firestore.auth.User;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static androidx.fragment.app.FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
 
@@ -37,6 +43,8 @@ public class MainActivity2 extends AppCompatActivity {
     private BottomNavigationView bottom_nav_bar = null;
     private final String TAG = "mainactivity";
     ViewPager viewPager = null;
+    private ViewModel viewModel;
+    List<String> user_info = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +56,13 @@ public class MainActivity2 extends AppCompatActivity {
         }
 
         PlacesClient placesClient = Places.createClient(this);
+
+        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        ((UserViewModel) viewModel).getSelectedItem().observe(this, items -> {
+            // update UI
+            user_info = items;
+            Log.d(TAG,user_info.get(0)+", "+user_info.get(1));
+        });
 
 
         bottom_nav_bar = (BottomNavigationView) findViewById(R.id.bottom_navigation);
