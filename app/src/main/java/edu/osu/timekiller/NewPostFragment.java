@@ -191,7 +191,7 @@ public class NewPostFragment extends Fragment {
                         Toast.makeText(getContext(), "Please select location before submitting", Toast.LENGTH_SHORT).show();
                     } else {
 
-                        DocumentReference doc = fStore.collection("information").document(userId);
+                        DocumentReference doc = fStore.collection("Information").document(userId);
 
                         doc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
