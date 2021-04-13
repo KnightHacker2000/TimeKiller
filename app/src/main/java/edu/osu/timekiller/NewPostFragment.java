@@ -10,8 +10,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,8 +67,6 @@ public class NewPostFragment extends Fragment {
     private TextInputEditText contentTextView = null;
     private TextView locationTextView = null;
     private String post_cate = "";
-    private String email = "";
-    private String nickName = "";
     private Chip mChip = null;
     private int chip_checked_index = -1;
     private LatLng post_location = null;
@@ -90,21 +86,6 @@ public class NewPostFragment extends Fragment {
     public static NewPostFragment newInstance() {
         NewPostFragment fragment = new NewPostFragment();
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        DocumentReference doc = fStore.collection("information").document(userId);
-
-        ViewModel viewModel = new ViewModelProvider(getActivity()).get(UserViewModel.class);
-        ((UserViewModel) viewModel).getSelectedItem().observe(this, items -> {
-            // update UI
-            nickName = items.get(0);
-            email = items.get(1);
-        });
-
     }
 
     @Override
@@ -210,7 +191,37 @@ public class NewPostFragment extends Fragment {
                         Toast.makeText(getContext(), "Please select location before submitting", Toast.LENGTH_SHORT).show();
                     } else {
 
-                        DocumentReference doc = fStore.collection("posts").document();
+                        DocumentReference doc = fStore.collection("Information").document(userId);
+
+                        doc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot document) {
+                                String email = document.getString("email");
+                                String nickName = document.getString("nickname");
+                                List<String> participants = new ArrayList<>();
+                                participants.add(userId);
+                                updateMap.put("title", titleTextView.getText().toString());
+                                updateMap.put("description", contentTextView.getText().toString());
+                                updateMap.put("location_lat", post_location.latitude);
+                                updateMap.put("location_long", post_location.longitude);
+                                updateMap.put("post_category", post_cate);
+                                updateMap.put("user_id", userId);
+                                updateMap.put("place_id", placeID);
+                                updateMap.put("place_name", placeName);
+                                updateMap.put("participants", participants);
+                                updateMap.put("contact_email", email);
+                                updateMap.put("contact_name", nickName);
+                                //updateMap.put("country",)
+
+                                mCollectionReference.document().set(updateMap);
+                                Toast.makeText(getContext(), "Create Post Success", Toast.LENGTH_SHORT).show();
+
+                                titleTextView.setText("");
+                                contentTextView.setText("");
+                                locationTextView.setText("Location Not Set");
+                                mChipArr[chip_checked_index].setChecked(false);
+                            }
+                        });
 
                         doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
@@ -218,33 +229,13 @@ public class NewPostFragment extends Fragment {
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
 
-                                    List<String> participants = new ArrayList<>();
-                                    participants.add(userId);
-
-                                    updateMap.put("title", titleTextView.getText().toString());
-                                    updateMap.put("description", contentTextView.getText().toString());
-                                    updateMap.put("location_lat", post_location.latitude);
-                                    updateMap.put("location_long", post_location.longitude);
-                                    updateMap.put("post_category", post_cate);
-                                    updateMap.put("user_id", userId);
-                                    updateMap.put("place_id", placeID);
-                                    updateMap.put("place_name", placeName);
-                                    updateMap.put("participants", participants);
-                                    updateMap.put("contact_email", email);
-                                    updateMap.put("contact_name", nickName);
-                                    //updateMap.put("country",)
-
-                                    mCollectionReference.document().set(updateMap);
-                                    Toast.makeText(getContext(), "Create Post Success", Toast.LENGTH_SHORT).show();
-
-                                    titleTextView.setText("");
-                                    contentTextView.setText("");
-                                    locationTextView.setText("Location Not Set");
-                                    mChipArr[chip_checked_index].setChecked(false);
-
                                 }
                             }
                         });
+
+
+
+                        //getActivity().getFragmentManager().beginTransaction().remove(this).commit();
                     }
                 }
             });

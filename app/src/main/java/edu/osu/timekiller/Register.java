@@ -121,9 +121,7 @@ public class Register extends AppCompatActivity {
                             Map<String,Object> user = new HashMap<>();
                             user.put("nickname",nickName);
                             user.put("email",email);
-
-                            // Dummy high score
-                            user.put("high_score","100");
+                            user.put("user_id", userID.toString());
 
                             documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

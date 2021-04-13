@@ -1,17 +1,15 @@
 package edu.osu.timekiller;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,18 +22,31 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.Executor;
 import java.util.zip.Inflater;
 
+
+class post{
+
+}
 public class UserProfileFragment extends Fragment {
 
 
@@ -43,9 +54,18 @@ public class UserProfileFragment extends Fragment {
     TextView nickName, email,resetNickmame,post;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
+
+    DatabaseReference dbPost;
     String userId;
+    Query query;
+    RecyclerView recyclerView;
+    PostAdapter adapter;
+    List<List> postList = new ArrayList<>();
+
 
     DocumentReference documentReference;
+    CollectionReference postdb;
+    String description_data;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -53,13 +73,34 @@ public class UserProfileFragment extends Fragment {
 
 
     public void onCreate(Bundle savedInstanceState) {
+        fStore = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
         fAuth = FirebaseAuth.getInstance();
         if(fAuth.getCurrentUser() != null){
-            fStore = FirebaseFirestore.getInstance();
             userId = fAuth.getCurrentUser().getUid();
             documentReference = fStore.collection(("Information")).document(userId);
+            postdb = fStore.collection("posts");
+            dbPost = FirebaseDatabase.getInstance().getReference("posts");
         }
+
+        postdb.whereEqualTo("user_id",fAuth.getCurrentUser().getUid().toString()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                String location_data = "";
+                String description_data = "";
+                postList = new ArrayList<>();
+                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
+                    description_data = documentSnapshot.get("description").toString();
+                    location_data = documentSnapshot.get("place_name").toString();
+                    List temp_list = new ArrayList();
+                    temp_list.add(location_data);
+                    temp_list.add(description_data);
+                    postList.add(temp_list);
+                }
+            }
+        });
+
     }
 
 
@@ -68,10 +109,35 @@ public class UserProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        PostAdapter adapter = new PostAdapter(postList);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+
+        recyclerView = (RecyclerView)view.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setAdapter(adapter);
+
+
+
+//        postdb.whereEqualTo("user_id",fAuth.getCurrentUser().getUid().toString()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                String data = "";
+//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
+//                    data = documentSnapshot.get("description").toString();
+//                    postList.add(data);
+//                }
+//            }
+//        });
+
+
 
         nickName = view.findViewById(R.id.nickName_text);
         email = view.findViewById(R.id.emailText);
         resetNickmame = view.findViewById(R.id.reset_nickname);
+//        query = FirebaseDatabase.getInstance().getReference("posts")
+//                .orderByChild("user_id")
+//                .equalTo("chenqiheng003@163.com");
 
         // From MainActivity
 
@@ -102,6 +168,8 @@ public class UserProfileFragment extends Fragment {
 
                         updateMap.put("nickname",newNickname);
                         updateMap.put("email",email.getText().toString());
+                        updateMap.put("user_id",fAuth.getCurrentUser().getUid().toString());
+
                         documentReference.set(updateMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -134,26 +202,33 @@ public class UserProfileFragment extends Fragment {
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String email_text = documentSnapshot.getString("email");
-                String nickName_text = documentSnapshot.getString("nickname");
-                email.setText(email_text);
-                nickName.setText(nickName_text);
-
-                List<String> user_info = new ArrayList<>();
-
-                user_info.add(nickName_text);
-                user_info.add(email_text);
-
-                ViewModel viewModel = new ViewModelProvider(getActivity()).get(UserViewModel.class);
-                ((UserViewModel) viewModel).selectItem(user_info);
+                email.setText(documentSnapshot.getString("email"));
+                nickName.setText(documentSnapshot.getString("nickname"));
 
             }
+
         });
+
+
+
+//        postdb.whereEqualTo("user_id","FUaLAmb26paz7iI0UpJRuxVD8hZ2").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                String data = "";
+//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
+//                    data = documentSnapshot.get("description").toString();
+//                    post.setText(data);
+//                }
+//
+//            }
+//        });
+
     }
 
     public void logout(View view){
         FirebaseAuth.getInstance().signOut();
         Intent myIntent = new Intent(getActivity(), Login.class);
         startActivity(myIntent);
+        //finish();
     }
 }
