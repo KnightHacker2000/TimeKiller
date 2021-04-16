@@ -28,6 +28,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +60,23 @@ public class Login extends AppCompatActivity {
         LoginButton = findViewById(R.id.login_button);
         alreadyRegistered = findViewById(R.id.already_resigtered);
         forgetLink = findViewById(R.id.forget_password);
-
+//        FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+//
+//        CollectionReference postdb  = fStore.collection("posts");
+//        postdb.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                String title = "";
+//                String description = "";
+//                List<Card> postList = ListViewFragment.getPostList();
+//                       postList = new ArrayList<>();
+//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
+//                    title = documentSnapshot.get("title").toString();
+//                    description = documentSnapshot.get("description").toString();
+//                    postList.add(new Card(title,description));
+//                }
+//            }
+//        });
         LoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -195,6 +218,7 @@ public class Login extends AppCompatActivity {
 
         // notificationId is a unique int for each notification that you must define
         notificationManager.notify(SMS_NOTI_ID, builder.build());
+
     }
 
     // Set up Test_channel notification channel

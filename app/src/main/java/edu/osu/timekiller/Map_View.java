@@ -123,7 +123,6 @@ public class Map_View extends Fragment {
                         String userId = marker.getSnippet();
                         Intent intent = new Intent(getActivity(), InfoActivity.class);
                         intent.putExtra("post_id",marker.getSnippet());
-
                         startActivity(intent);
                         return true;
                     }
@@ -147,7 +146,7 @@ public class Map_View extends Fragment {
     }
 
     private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getContext(),
+        if (ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -155,10 +154,10 @@ public class Map_View extends Fragment {
             locationPermissionGranted = true;
             Log.d(TAG, "Location Permission Granted");
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
+            ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            ActivityCompat.requestPermissions(getActivity(),
+            ActivityCompat.requestPermissions(requireActivity(),
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
         }
@@ -173,9 +172,9 @@ public class Map_View extends Fragment {
         getLocationPermission();
         try {
             if (locationPermissionGranted) {
-                fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+                fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
                 Task<Location> locationResult = fusedLocationClient.getLastLocation();
-                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
+                locationResult.addOnCompleteListener(requireActivity(), new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
