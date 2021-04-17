@@ -3,20 +3,29 @@ package edu.osu.timekiller;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,6 +44,8 @@ public class ListViewFragment extends Fragment {
     private  List<Card> postList = new ArrayList<>();
     private FirebaseFirestore fStore;
     private FirestoreRecyclerAdapter adapter;
+    private EditText editText;
+    private  RecyclerView recyclerView;
     public ListViewFragment() {
 
     }
@@ -47,25 +58,6 @@ public class ListViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Query query = fStore.collection("posts");
-        //CollectionReference postdb  = fStore.collection("posts");
-//        postdb.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                String title = "";
-//                String description = "";
-//                postList = new ArrayList<>();
-//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
-//                    title = documentSnapshot.get("title").toString(); //wrap in objests.nonnul
-//                    description = documentSnapshot.get("description").toString();
-//                    postList.add(new Card(title,description));
-//                    // Data change
-//
-//                }Log.i("List View Loading:","now");
-//            }
-//
-//        });
     }
 
     @Override
@@ -74,7 +66,29 @@ public class ListViewFragment extends Fragment {
         // Inflate the layout for this fragment
         // Set up the RecyclerView
         View view = inflater.inflate(R.layout.fragment_list_view, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        editText = (EditText)view.findViewById(R.id.searchBar);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!s.toString().isEmpty()){
+                    search(s.toString());
+                }else{
+                    search("");
+                }
+            }
+        });
 
         fStore = FirebaseFirestore.getInstance();
         Query query = fStore.collection("posts");
@@ -99,13 +113,9 @@ public class ListViewFragment extends Fragment {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
+        CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
 
-
-//        CardRecyclerViewAdapter adapter = new CardRecyclerViewAdapter(postList);
         recyclerView.setAdapter(adapter);
-//        int largePadding = getResources().getDimensionPixelSize(R.dimen.grid_spacing);
-//        int smallPadding = getResources().getDimensionPixelSize(R.dimen.grid_spacing_small);
-//        recyclerView.addItemDecoration(new GridItemDecoration(largePadding, smallPadding));
         return view;
     }
 
@@ -119,5 +129,29 @@ public class ListViewFragment extends Fragment {
     public void onStop() {
         super.onStop();
         adapter.stopListening();
+    }
+    private void search(String s){
+
+        Query query = fStore.collection("posts").orderBy("title").startAt(s).endAt(s+"\uf8ff");
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(!value.isEmpty()){
+                    postList = new ArrayList<>();
+                    for(DocumentSnapshot document:value.getDocuments()){
+                        String title = document.getString("title");
+                        String des = document.getString("description");
+                        Card tmp = new Card(title,des);
+                        postList.add(tmp);
+
+                    }
+                    CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
+                    recyclerView.setAdapter(adapter1);
+                    adapter1.notifyDataSetChanged();
+
+                }
+            }
+        });
+
     }
 }

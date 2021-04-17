@@ -6,12 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ListViewFragment">
 
+    <EditText
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/searchBar"
+        android:hint="Search"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="62dp"
+        android:layout_marginTop="50dp"
         android:clipChildren="true"
         android:clipToPadding="true"
         android:paddingLeft="4dp"
@@ -19,13 +24,4 @@
         android:paddingRight="4dp"
         android:paddingBottom="16dp" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Search" />
-    </com.google.android.material.textfield.TextInputLayout>
 </FrameLayout>

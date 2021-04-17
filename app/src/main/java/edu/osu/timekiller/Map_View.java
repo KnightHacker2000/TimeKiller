@@ -2,6 +2,7 @@ package edu.osu.timekiller;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -146,7 +147,8 @@ public class Map_View extends Fragment {
     }
 
     private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(requireContext(),
+
+        if (ContextCompat.checkSelfPermission((Activity)requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -154,14 +156,16 @@ public class Map_View extends Fragment {
             locationPermissionGranted = true;
             Log.d(TAG, "Location Permission Granted");
         } else {
-            ActivityCompat.requestPermissions(requireActivity(),
+            ActivityCompat.requestPermissions((Activity)requireActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            ActivityCompat.requestPermissions(requireActivity(),
+            ActivityCompat.requestPermissions((Activity)requireActivity(),
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
         }
     }
+
+
 
     private void getDeviceLocation() {
         /*

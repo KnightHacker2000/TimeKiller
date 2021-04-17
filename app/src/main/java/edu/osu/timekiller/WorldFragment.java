@@ -27,17 +27,13 @@ public class WorldFragment extends Fragment {
 
     TabLayout tabLayout;
     ViewPager viewPager;
+    Adapter adapter;
     public WorldFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     * @return A new instance of fragment WorldFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static WorldFragment newInstance(String param1, String param2) {
+
+    public static WorldFragment newInstance() {
         WorldFragment fragment = new WorldFragment();
 
         return fragment;
@@ -56,7 +52,7 @@ public class WorldFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_world, container, false);
         tabLayout = (TabLayout) v.findViewById(R.id.tabs);
         viewPager = (ViewPager) v.findViewById(R.id.viewpager);
-        Adapter adapter = new Adapter(getChildFragmentManager());
+        adapter = new Adapter(getChildFragmentManager());
         adapter.addFragment(Map_View.newInstance(), "map view");
         adapter.addFragment(ListViewFragment.newInstance(), "list view");
         viewPager.setAdapter(adapter);

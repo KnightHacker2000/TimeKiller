@@ -2,6 +2,7 @@ package edu.osu.timekiller;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.solver.widgets.ConstraintAnchor;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -48,9 +49,9 @@ public class MainActivity2 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyBsQ-4iMKqnVLLwlzcDN67bR68DdrckFvU");
         }
