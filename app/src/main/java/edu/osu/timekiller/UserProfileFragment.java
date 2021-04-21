@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,12 +20,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -32,6 +34,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -51,16 +54,16 @@ public class UserProfileFragment extends Fragment {
 
 
     public static final String TAG = Register.class.getName();
+    private FirestoreRecyclerAdapter updateAdapter;
     TextView nickName, email,resetNickmame,post;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
 
     DatabaseReference dbPost;
     String userId;
-    Query query;
     RecyclerView recyclerView;
     PostAdapter adapter;
-    List<List> postList = new ArrayList<>();
+    List<Card> postList = new ArrayList<>();
 
 
     DocumentReference documentReference;
@@ -91,12 +94,11 @@ public class UserProfileFragment extends Fragment {
                 String description_data = "";
                 postList = new ArrayList<>();
                 for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
-                    description_data = documentSnapshot.get("description").toString();
-                    location_data = documentSnapshot.get("place_name").toString();
-                    List temp_list = new ArrayList();
-                    temp_list.add(location_data);
-                    temp_list.add(description_data);
-                    postList.add(temp_list);
+                    String location = documentSnapshot.getString("place_name");
+                    String contenxt = documentSnapshot.getString("description");
+                    String title = documentSnapshot.getString("title");
+                    Card tmp = new Card(title, contenxt, location);
+                    postList.add(tmp);
                 }
             }
         });
@@ -104,31 +106,24 @@ public class UserProfileFragment extends Fragment {
     }
 
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
-        PostAdapter adapter = new PostAdapter(postList);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
 
+        View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        Query query = fStore.collection("posts").whereEqualTo("user_id",fAuth.getCurrentUser().getUid().toString());
+        FirestoreRecyclerOptions<Card> options = new FirestoreRecyclerOptions.Builder<Card>()
+                .setQuery(query, Card.class)
+                .build();
+        adapter = new PostAdapter(options);
         recyclerView = (RecyclerView)view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(llm);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+//        recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(adapter);
-
-
-
-//        postdb.whereEqualTo("user_id",fAuth.getCurrentUser().getUid().toString()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                String data = "";
-//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
-//                    data = documentSnapshot.get("description").toString();
-//                    postList.add(data);
-//                }
-//            }
-//        });
 
 
 
@@ -169,6 +164,7 @@ public class UserProfileFragment extends Fragment {
                         updateMap.put("nickname",newNickname);
                         updateMap.put("email",email.getText().toString());
                         updateMap.put("user_id",fAuth.getCurrentUser().getUid().toString());
+                        nickName.setText(newNickname);
 
                         documentReference.set(updateMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -230,5 +226,17 @@ public class UserProfileFragment extends Fragment {
         Intent myIntent = new Intent(getActivity(), Login.class);
         startActivity(myIntent);
         //finish();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 }

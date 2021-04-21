@@ -141,7 +141,8 @@ public class ListViewFragment extends Fragment {
                     for(DocumentSnapshot document:value.getDocuments()){
                         String title = document.getString("title");
                         String des = document.getString("description");
-                        Card tmp = new Card(title,des);
+                        String loc = document.getString("place_name");
+                        Card tmp = new Card(title,des,loc);
                         postList.add(tmp);
 
                     }
