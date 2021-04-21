@@ -142,14 +142,14 @@ public class ListViewFragment extends Fragment {
                         String title = document.getString("title");
                         String des = document.getString("description");
                         String loc = document.getString("place_name");
-                        Card tmp = new Card(title,des,loc);
+                        String post_id = document.getString("post_id");
+                        Card tmp = new Card(title, des, loc, post_id);
                         postList.add(tmp);
 
                     }
                     CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
                     recyclerView.setAdapter(adapter1);
                     adapter1.notifyDataSetChanged();
-
                 }
             }
         });

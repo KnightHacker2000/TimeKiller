@@ -191,7 +191,8 @@ public class NewPostFragment extends Fragment {
                         Toast.makeText(getContext(), "Please select location before submitting", Toast.LENGTH_SHORT).show();
                     } else {
 
-                        DocumentReference doc = fStore.collection("Information").document(userId);
+//                        DocumentReference doc = fStore.collection("Information").document(userId);
+                        DocumentReference doc = fStore.collection("posts").document();
 
                         doc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
@@ -211,9 +212,9 @@ public class NewPostFragment extends Fragment {
                                 updateMap.put("participants", participants);
                                 updateMap.put("contact_email", email);
                                 updateMap.put("contact_name", nickName);
-                                //updateMap.put("country",)
-
-                                mCollectionReference.document().set(updateMap);
+                                String temp_id = document.getId();
+                                updateMap.put("post_id", temp_id);
+                                mCollectionReference.document(temp_id.toString()).set(updateMap);
                                 Toast.makeText(getContext(), "Create Post Success", Toast.LENGTH_SHORT).show();
 
                                 titleTextView.setText("");

@@ -68,7 +68,7 @@ public class PostAdapter extends FirestoreRecyclerAdapter<Card, PostAdapter.Post
 
                            String newPostContent = resetText.getText().toString();
                            //Need a post id to edit
-                           postdb.whereEqualTo("description",model.getDescription()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                           postdb.whereEqualTo("post_id",model.getPost_id()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                @Override
                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                    if (task.isSuccessful()) {
@@ -90,16 +90,25 @@ public class PostAdapter extends FirestoreRecyclerAdapter<Card, PostAdapter.Post
                                    }
                                }
                            });
-
-
-
-
                        }
                    });
 
                    resetDialog.setNeutralButton("Delete Post", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialogInterface, int i) {
+                           postdb.document(model.getPost_id().toString()).delete()
+                           .addOnSuccessListener(new OnSuccessListener<Void>() {
+                               @Override
+                               public void onSuccess(Void aVoid) {
+                                   Toast.makeText(mCtx, "You successfully deleted this post", Toast.LENGTH_LONG).show();
+                               }
+
+                           }).addOnFailureListener(new OnFailureListener() {
+                               @Override
+                               public void onFailure(@NonNull Exception e) {
+                                   Log.d(TAG, "Failure: " + e.toString());
+                               }
+                           });
                            // Empty for closing
                        }
                    });

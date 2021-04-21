@@ -97,7 +97,8 @@ public class UserProfileFragment extends Fragment {
                     String location = documentSnapshot.getString("place_name");
                     String contenxt = documentSnapshot.getString("description");
                     String title = documentSnapshot.getString("title");
-                    Card tmp = new Card(title, contenxt, location);
+                    String post_id = documentSnapshot.getString("post_id");
+                    Card tmp = new Card(title, contenxt, location, post_id);
                     postList.add(tmp);
                 }
             }
