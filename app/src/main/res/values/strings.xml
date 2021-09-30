@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TimeKiller</string>
+    <string name="app_name">Pal Finder</string>
     <string name="start_map">Launch Map</string>
     <string name="start_score_board">Top Players</string>
     <string name="button_new_event">Create A New HotSpot</string>
