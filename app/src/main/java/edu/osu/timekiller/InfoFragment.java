@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -132,13 +133,23 @@ public class InfoFragment extends Fragment {
 
                     }
                     List<String> participants = (List<String>) document.get("participants");
-                    String email = document.getString("contact_email");
-                    String name = document.getString("contact_name");
+                    String current_post_user_id = document.getString("user_id");
+                    DocumentReference doc = fStore.collection("Information").document(current_post_user_id);
+                    doc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot document) {
+                            String email = document.getString("email");
+                            String nickName = document.getString("nickname");
+                            mContactView.setText("Nickname: "+nickName+"\n"+"Email: "+ email);
+                        }
+
+                    });
+
                     if(participants.contains(userId)){
                         mButton.setEnabled(false);
                         mContactPrompt.setVisibility(View.VISIBLE);
                         mContactView.setVisibility(View.VISIBLE);
-                        mContactView.setText("nickname: "+name+","+"\n"+"Email: "+email);
+
                     } else{
                         mButton.setEnabled(true);
                         mContactPrompt.setVisibility(View.INVISIBLE);
