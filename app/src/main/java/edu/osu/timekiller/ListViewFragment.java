@@ -112,7 +112,7 @@ public class ListViewFragment extends Fragment {
 
 
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.VERTICAL, false));
         CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
 
         recyclerView.setAdapter(adapter);

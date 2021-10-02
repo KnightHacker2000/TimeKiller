@@ -134,6 +134,45 @@ public class Map_View extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("posts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                LatLng position = new LatLng(document.getDouble("location_lat"), document.getDouble("location_long"));
+                                int cate_res = -1;
+                                if(document.getString("post_category") == "sport"){
+                                    cate_res = R.drawable.outline_fitness_center_24;
+                                } else if (document.getString("post_category") == "transportation"){
+                                    cate_res = R.drawable.outline_drive_eta_24;
+                                } else if (document.getString("post_category") == "academic"){
+                                    cate_res = R.drawable.outline_auto_stories_24;
+                                }  else if (document.getString("post_category") == "entertainment"){
+                                    cate_res = R.drawable.outline_attractions_24;
+                                }
+
+                                //BitmapDescriptor icon = BitmapFromVector(getContext(),cate_res);
+
+                                googleMap.addMarker(new MarkerOptions()
+                                        .position(position)
+                                        .snippet(document.getId())
+                                );
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
+
     private void enableMyLocation() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing. Show rationale and request permission

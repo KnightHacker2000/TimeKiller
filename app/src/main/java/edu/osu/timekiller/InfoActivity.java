@@ -23,7 +23,6 @@ public class InfoActivity extends AppCompatActivity {
         FragmentTransaction transaction =
                 this.getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.layout, info);
-        transaction.addToBackStack(null);
         transaction.commit();
     }
 }
