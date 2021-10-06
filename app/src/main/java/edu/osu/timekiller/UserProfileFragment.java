@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,7 +59,7 @@ public class UserProfileFragment extends Fragment {
     TextView nickName, email,resetNickmame,post;
     FirebaseAuth fAuth;
     FirebaseFirestore fStore;
-
+    Button logOutButton;
     DatabaseReference dbPost;
     String userId;
     RecyclerView recyclerView;
@@ -131,6 +132,7 @@ public class UserProfileFragment extends Fragment {
         nickName = view.findViewById(R.id.nickName_text);
         email = view.findViewById(R.id.emailText);
         resetNickmame = view.findViewById(R.id.reset_nickname);
+        logOutButton = view.findViewById(R.id.log_out_button_fragment);
 //        query = FirebaseDatabase.getInstance().getReference("posts")
 //                .orderByChild("user_id")
 //                .equalTo("chenqiheng003@163.com");
@@ -190,6 +192,14 @@ public class UserProfileFragment extends Fragment {
                 resetDialog.create().show();
             }
         });
+
+        logOutButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+
         return view;
     }
 
@@ -206,27 +216,13 @@ public class UserProfileFragment extends Fragment {
 
         });
 
-
-
-//        postdb.whereEqualTo("user_id","FUaLAmb26paz7iI0UpJRuxVD8hZ2").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                String data = "";
-//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
-//                    data = documentSnapshot.get("description").toString();
-//                    post.setText(data);
-//                }
-//
-//            }
-//        });
-
     }
 
-    public void logout(View view){
+    public void logout(){
         FirebaseAuth.getInstance().signOut();
         Intent myIntent = new Intent(getActivity(), Login.class);
         startActivity(myIntent);
-        //finish();
+        getActivity().finish();
     }
 
     @Override
