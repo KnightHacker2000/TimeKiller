@@ -14,9 +14,5 @@
     <color name="sunset_sky">#ec8100</color>
     <color name="night_sky">#05192e</color>
     <color name="sea">#224869</color>
-<!--    Dark Mode-->
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorTextView">#000</color>
+    <color name="colorTextView">#000000</color>
 </resources>

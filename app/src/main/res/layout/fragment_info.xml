@@ -117,7 +117,7 @@
             android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
+            android:textSize="18sp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:fontFamily="sans-serif"
