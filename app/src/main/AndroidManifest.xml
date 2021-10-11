@@ -24,11 +24,6 @@
         <activity android:name=".MainActivity2" />
 <!--            android:launchMode = "singleInstance"/>-->
         <activity android:name=".CreatePost" />
-        <activity
-            android:name=".Background"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:turnScreenOn="true" /> <!-- <activity android:name=".TouchActivity" /> -->
         <activity android:name=".Register" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

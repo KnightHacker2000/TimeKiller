@@ -12,9 +12,6 @@
         android:layout_margin="@dimen/post_item_margin">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             >
@@ -38,12 +35,11 @@
                 android:layout_height="wrap_content"
                 android:text="Post context"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
-                android:textColor="#000000"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/location_context_text"
-                tools:text="This is a long post, This is a long post, "/>
+                tools:text="This is a long post, This is a long post, " />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
