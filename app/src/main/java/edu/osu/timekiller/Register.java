@@ -54,7 +54,7 @@ public class Register extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         if(fAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(),MainActivity2.class));
+            startActivity(new Intent(getApplicationContext(),MainActivity.class));
             finish();
         }
 
@@ -134,7 +134,7 @@ public class Register extends AppCompatActivity {
                                     Log.d(TAG, "Failure: " + e.toString());
                                 }
                             });
-                            startActivity(new Intent(getApplicationContext(),MainActivity2.class));
+                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
 
                         }else {
                             Toast.makeText(Register.this, "Error happened" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();

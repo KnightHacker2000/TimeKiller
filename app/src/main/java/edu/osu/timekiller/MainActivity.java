@@ -40,11 +40,11 @@ import java.util.List;
 
 import static androidx.fragment.app.FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
 
-public class MainActivity2 extends AppCompatActivity {
+//
+public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottom_nav_bar = null;
-    private final String TAG = "mainactivity";
+    private final String TAG = "MainActivity";
     ViewPager viewPager = null;
-    private ViewModel viewModel;
     List<String> user_info = new ArrayList<>();
 
     @Override
@@ -58,13 +58,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         PlacesClient placesClient = Places.createClient(this);
 
-        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        ((UserViewModel) viewModel).getSelectedItem().observe(this, items -> {
-            // update UI
-            user_info = items;
-            Log.d(TAG,user_info.get(0)+", "+user_info.get(1));
-        });
-
+        // Nav_bar matches three major fragments WorldFragment, NewPostFragment, and UserProfileFragment
 
         bottom_nav_bar = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         Fragment[] frags = new Fragment[3];
@@ -72,6 +66,8 @@ public class MainActivity2 extends AppCompatActivity {
         frags[1] = new NewPostFragment();
         frags[2] = new UserProfileFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+
         FragmentStatePagerAdapter adapter = new FragmentStatePagerAdapter(fragmentManager,
                 BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @NonNull
@@ -85,41 +81,12 @@ public class MainActivity2 extends AppCompatActivity {
                 return frags.length;
             }
         };
+
+        // Connects ViewPager to fragments
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                if(position == 0){
-                    bottom_nav_bar.setSelectedItemId(R.id.item_1);
-                }
-
-                if(position == 1){
-                    bottom_nav_bar.setSelectedItemId(R.id.item_2);
-                }
-
-                if(position == 3){
-                    bottom_nav_bar.setSelectedItemId(R.id.item_3);
-                }
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-
-
-        });
-
-
+        // Setting different display fragment according to users selections
         bottom_nav_bar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener(){
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

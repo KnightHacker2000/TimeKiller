@@ -16,15 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TimeKiller"
-
         >
+        <!-- All needed activity and pre lanuch classes should be decalred here -->
         <activity android:name=".InfoActivity"></activity>
-        <!-- <activity android:name=".Login" /> -->
-<!--        <activity android:name=".MainActivity" />-->
-        <activity android:name=".MainActivity2" />
-<!--            android:launchMode = "singleInstance"/>-->
+        <activity android:name=".MainActivity" />
+
+        <!-- android:launchMode = "singleInstance"/>-->
         <activity android:name=".CreatePost" />
         <activity android:name=".Register" />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -37,7 +37,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-<!--        <activity android:name=".ScoreBoard" />-->
         <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

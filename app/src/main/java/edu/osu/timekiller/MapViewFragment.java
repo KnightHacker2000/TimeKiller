@@ -1,145 +1,295 @@
-///**
-// * Fragment Class for a Top Player Map View
-// *     TODO: Access User Locations, Show Highest Score On Map
-// */
-//package edu.osu.timekiller;
-//
-//import androidx.annotation.NonNull;
-//import androidx.annotation.Nullable;
-//import androidx.core.app.ActivityCompat;
-//import androidx.fragment.app.Fragment;
-//
-//import android.Manifest;
-//import android.content.pm.PackageManager;
-//import android.os.Bundle;
-//import android.location.Location;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.ViewGroup;
-//import android.widget.Toast;
-//
-//
-//import com.google.android.gms.location.LocationRequest;
-//import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.OnMapReadyCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.android.gms.maps.model.MarkerOptions;
-//
-//public class MapViewFragment extends Fragment
-//        implements
-//        GoogleMap.OnMyLocationButtonClickListener,
-//        GoogleMap.OnMyLocationClickListener,
-//        OnMapReadyCallback,
-//        ActivityCompat.OnRequestPermissionsResultCallback {
-//
-//    private OnMapReadyCallback callback = new OnMapReadyCallback() {
-//
-//        /**
-//         * Request code for location permission request.
-//         *
-//         * @see #onRequestPermissionsResult(int, String[], int[])
-//         */
-//        private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-//
-//        /**
-//         * Flag indicating whether a requested permission has been denied after returning in
-//         * {@link #onRequestPermissionsResult(int, String[], int[])}.
-//         */
-//        private boolean permissionDenied = false;
-//
-//
-//        /**
-//         * Manipulates the map once available.
-//         * This callback is triggered when the map is ready to be used.
-//         * This is where we can add markers or lines, add listeners or move the camera.
-//         * In this case, we just add a marker near Sydney, Australia.
-//         * If Google Play services is not installed on the device, the user will be prompted to
-//         * install it inside the SupportMapFragment. This method will only be triggered once the
-//         * user has installed Google Play services and returned to the app.
-//         */
-//        @Override
-//        public void onMapReady(GoogleMap map) {
-//            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                // Permission to access the location is missing. Show rationale and request permission
-//                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_PERMISSION_REQUEST_CODE);
-//
-//            } else{
-//                if (map != null) {
-//                    map.setMyLocationEnabled(true);
-//                }
-//            }
-//            map.setMyLocationEnabled(true);
-//            map.setOnMyLocationButtonClickListener(this);
-//            map.setOnMyLocationClickListener(this);
-//            enableMyLocation(map);
-//
-////            LatLng sydney = new LatLng(47.6550, -122.3080);
-////            googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-////            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//        }
-//
-//        private void enableMyLocation(GoogleMap map){
-//            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                // Permission to access the location is missing. Show rationale and request permission
-//                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_PERMISSION_REQUEST_CODE);
-//
-//            } else{
-//                if (map != null) {
-//                    map.setMyLocationEnabled(true);
-//                }
-//            }
-//        }
-//    };
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             @Nullable ViewGroup container,
-//                             @Nullable Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_maps, container, false);
-//    }
-//
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//        SupportMapFragment mapFragment =
-//                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-//        if (mapFragment != null) {
-//            mapFragment.getMapAsync(callback);
-//        }
-//    }
-//
-//    @Override
-//    public boolean onMyLocationButtonClick() {
-//        return false;
-//    }
-//
-//    @Override
-//    public void onMyLocationClick(@NonNull Location location) {
-//        Toast.makeText(getActivity(), "Current location:\n" + location, Toast.LENGTH_LONG).show();
-//
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-//            return;
-//        }
-//
-//        if (PermissionUtils.isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
-//            // Enable the my location layer if the permission has been granted.
-//            enableMyLocation();
-//        } else {
-//            // Permission was denied. Display an error message
-//            // Display the missing permission error dialog when the fragments resume.
-//            permissionDenied = true;
-//        }
-//    }
-//
-//    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//
-//    }
-//}
+package edu.osu.timekiller;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.util.Log;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link MapViewFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class MapViewFragment extends Fragment {
+
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int DEFAULT_ZOOM = 15;
+    private MapView mMapView = null;
+    private GoogleMap googleMap;
+    private FusedLocationProviderClient fusedLocationClient = null;
+    private boolean locationPermissionGranted = false;
+    private Location lastKnownLocation;
+    private static final String TAG = "LocationService";
+
+
+    public MapViewFragment() {
+        // Required empty public constructor
+    }
+
+    public static MapViewFragment newInstance() {
+        MapViewFragment fragment = new MapViewFragment();
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps, null, false);
+        mMapView = (MapView) view.findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.onResume();
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap mMap) {
+
+                // Initialize googleMap API
+                googleMap = mMap;
+                // Enable zoom in and zoom out button on map
+                UiSettings uiSettings = googleMap.getUiSettings();
+                uiSettings.setZoomControlsEnabled(true);
+                // check if current theme is the dark mode
+                int nightModeFlags = getContext().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                switch (nightModeFlags){
+                    case Configuration.UI_MODE_NIGHT_YES:
+                        // Use for dark mode
+                        MapStyleOptions style = MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.mapstyle_night);
+                        mMap.setMapStyle(style);
+                        break;
+
+                    case Configuration.UI_MODE_NIGHT_NO:
+                        break;
+
+                    case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                        break;
+                }
+
+                getDeviceLocation();
+                // Get current location
+                googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        Toast.makeText(getContext(), "Locating", Toast.LENGTH_LONG)
+                                .show();
+                        getDeviceLocation();
+                        // Return false so that we don't consume the event and the default behavior still occurs
+                        // (the camera animates to the user's current position).
+                        return false;
+                    }
+                });
+                googleMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
+                    @Override
+                    public void onMyLocationClick(@NonNull Location location) {
+                        Toast.makeText(getContext(), "Current location:\n" + location, Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+                enableMyLocation();
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        // Get "post_id" from the maker users click
+                        String post_id = marker.getSnippet();
+                        // Passing "post_id" into activity storage map
+                        Intent intent = new Intent(getActivity(), InfoActivity.class);
+                        intent.putExtra("post_id",post_id);
+                        startActivity(intent);
+                        return true;
+                    }
+                });
+
+            }
+        });
+        return view;
+    }
+
+    // Continuing Refresh the map
+    @Override
+    public void onResume() {
+        super.onResume();
+        addMarkerHelper();
+    }
+
+    // Get location permission
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission((Activity)requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+            Log.d(TAG, "Location Permission Granted");
+        } else {
+            ActivityCompat.requestPermissions((Activity)requireActivity(),
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions((Activity)requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+        }
+    }
+
+    // Check condition and enable location
+    private void enableMyLocation() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing. Show rationale and request permission
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            if (googleMap != null) {
+                googleMap.setMyLocationEnabled(true);
+            }
+        }
+    }
+
+
+
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        Log.d(TAG, "getDeviceLocationRunning");
+        getLocationPermission();
+        try {
+            if (locationPermissionGranted) {
+                fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+                Task<Location> locationResult = fusedLocationClient.getLastLocation();
+                locationResult.addOnCompleteListener(requireActivity(), new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            lastKnownLocation = task.getResult();
+//                            Log.d(TAG,"Last Location:"+lastKnownLocation.getLatitude()+","+
+//                                    lastKnownLocation.getLongitude());
+                            if (lastKnownLocation != null) {
+
+                                UpdateUserLocation.updateUserLocation(lastKnownLocation, getContext());
+                                Log.d(TAG, "Location not Null!");
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+
+
+                                addMarkerHelper();
+
+
+                            }
+
+                        } else {
+                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            googleMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(new LatLng(47.6550, -122.3080), DEFAULT_ZOOM));
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
+
+    }
+
+    // Iterate the database and add pin makers on the google map
+    public void addMarkerHelper() {
+
+//        VisibleRegion viewPort = googleMap.getProjection().getVisibleRegion();
+//        LatLngBounds viewBound = viewPort.latLngBounds;
+//        LatLng northeast = viewBound.northeast; // test bound
+//        LatLng southwest = viewBound.southwest; // test bound
+
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("posts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                LatLng position = new LatLng(document.getDouble("location_lat"), document.getDouble("location_long"));
+                                int cate_res = -1;
+                                if(document.getString("post_category") == "sport"){
+                                    cate_res = R.drawable.outline_fitness_center_24;
+                                } else if (document.getString("post_category") == "transportation"){
+                                    cate_res = R.drawable.outline_drive_eta_24;
+                                } else if (document.getString("post_category") == "academic"){
+                                    cate_res = R.drawable.outline_auto_stories_24;
+                                }  else if (document.getString("post_category") == "entertainment"){
+                                    cate_res = R.drawable.outline_attractions_24;
+                                }
+
+                                //BitmapDescriptor icon = BitmapFromVector(getContext(),cate_res);
+
+                                googleMap.addMarker(new MarkerOptions()
+                                        .position(position)
+                                        .snippet(document.getId())
+                                );
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
+}

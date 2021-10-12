@@ -13,7 +13,7 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        Bundle extras = getIntent().getExtras(); //All activities are started with an Intent!
+        Bundle extras = getIntent().getExtras();
         String value = extras.getString("post_id");
 
         Bundle bundle = new Bundle();

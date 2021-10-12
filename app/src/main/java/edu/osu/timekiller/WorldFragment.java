@@ -23,6 +23,8 @@ import java.util.List;
  * Use the {@link WorldFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+// This fragment is to display google map and posts
 public class WorldFragment extends Fragment {
 
     TabLayout tabLayout;
@@ -35,7 +37,6 @@ public class WorldFragment extends Fragment {
 
     public static WorldFragment newInstance() {
         WorldFragment fragment = new WorldFragment();
-
         return fragment;
     }
 
@@ -48,18 +49,24 @@ public class WorldFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Get view and inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_world, container, false);
         tabLayout = (TabLayout) v.findViewById(R.id.tabs);
         viewPager = (ViewPager) v.findViewById(R.id.viewpager);
         adapter = new Adapter(getChildFragmentManager());
-        adapter.addFragment(Map_View.newInstance(), "map view");
+        // Embed MapViewFragment fragment to current WorldFragment
+        adapter.addFragment(MapViewFragment.newInstance(), "map view");
+        // Embed ListViewFragment fragment to current WorldFragment
         adapter.addFragment(ListViewFragment.newInstance(), "list view");
+        // Passes relations to viewPager
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         return v;
     }
 }
+
+
+// Override adapter
 class Adapter extends FragmentPagerAdapter {
     public final List<Fragment> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();
