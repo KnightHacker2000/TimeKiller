@@ -59,7 +59,7 @@ public class InfoFragment extends Fragment {
     FirebaseAuth fAuth = FirebaseAuth.getInstance();
     String userId = fAuth.getCurrentUser().getUid();
 
-    private final String TAG="infofrag";
+    private final String TAG="InfoFragment";
 
 
     public InfoFragment() {
@@ -94,6 +94,7 @@ public class InfoFragment extends Fragment {
         mButton = view.findViewById(R.id.button_join);
 
 
+        // Get "post_id" result from "posts" table
         DocumentReference doc = fStore.collection("posts").document(PID);
 
         doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -160,13 +161,12 @@ public class InfoFragment extends Fragment {
 
                     final List<Place.Field> fields = Collections.singletonList(Place.Field.PHOTO_METADATAS);
 
+                    // Get placeRequest object by placeId
                     final FetchPlaceRequest placeRequest = FetchPlaceRequest.newInstance(placeId, fields);
 
-
-
+                    // Fetch actual place object
                     placesClient.fetchPlace(placeRequest).addOnSuccessListener((response) -> {
                         final Place place = response.getPlace();
-
                         // Get the photo metadata.
                         final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
                         if (metadata == null || metadata.isEmpty()) {

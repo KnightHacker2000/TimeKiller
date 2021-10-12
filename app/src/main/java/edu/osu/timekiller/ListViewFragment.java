@@ -1,9 +1,11 @@
 package edu.osu.timekiller;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -103,8 +105,15 @@ public class ListViewFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull CardViewHolder holder, int position, @NonNull Card model) {
-                holder.title.setText(model.getTitle());
-                holder.description.setText(model.getDescription());
+                holder.title.setText("Title: " + model.getTitle());
+                holder.description.setText("Description: "+ model.getDescription());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), InfoActivity.class);
+                    intent.putExtra("post_id",model.getPost_id());
+                    startActivity(intent);
+                }});
             }
 
         };
@@ -113,7 +122,7 @@ public class ListViewFragment extends Fragment {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1, GridLayoutManager.VERTICAL, false));
-        CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
+//        CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
 
         recyclerView.setAdapter(adapter);
         return view;
@@ -147,9 +156,9 @@ public class ListViewFragment extends Fragment {
                         postList.add(tmp);
 
                     }
-                    CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
-                    recyclerView.setAdapter(adapter1);
-                    adapter1.notifyDataSetChanged();
+//                    CardRecyclerViewAdapter adapter1 = new CardRecyclerViewAdapter(postList);
+                    recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
                 }
             }
         });
