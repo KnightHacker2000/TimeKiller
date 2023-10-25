@@ -26,7 +26,7 @@ public class TouchActivity extends AppCompatActivity implements GestureDetector.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_touch);
         mainLayout = findViewById(R.id.main);
         image = (ImageView) findViewById(R.id.mainCharacter);
         detectMe = new GestureDetectorCompat(this, this);

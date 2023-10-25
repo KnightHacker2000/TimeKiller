@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_1"
+        android:enabled="true"
+        android:icon="@drawable/baseline_language_24"
+        android:title="World"/>
+    <item
+        android:id="@+id/item_2"
+        android:enabled="true"
+        android:icon="@drawable/baseline_search_24"
+        android:title="PalFinder"/>
+
+    <item
+        android:id="@+id/item_3"
+        android:enabled="true"
+        android:icon="@drawable/baseline_account_circle_24"
+        android:title="Me"/>
+
+
+</menu>

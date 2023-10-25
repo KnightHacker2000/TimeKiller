@@ -1,7 +1,11 @@
 package edu.osu.timekiller;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -22,10 +28,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Login extends AppCompatActivity {
+    private static final int SMS_NOTI_ID = 0;
+    private static final String TEST_CHANNEL_ID = "welcome_channel";
     EditText emailField,passwordField;
     Button LoginButton;
     TextView alreadyRegistered, forgetLink;
@@ -45,7 +60,23 @@ public class Login extends AppCompatActivity {
         LoginButton = findViewById(R.id.login_button);
         alreadyRegistered = findViewById(R.id.already_resigtered);
         forgetLink = findViewById(R.id.forget_password);
-
+//        FirebaseFirestore fStore = FirebaseFirestore.getInstance();
+//
+//        CollectionReference postdb  = fStore.collection("posts");
+//        postdb.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                String title = "";
+//                String description = "";
+//                List<Card> postList = ListViewFragment.getPostList();
+//                       postList = new ArrayList<>();
+//                for (QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots){
+//                    title = documentSnapshot.get("title").toString();
+//                    description = documentSnapshot.get("description").toString();
+//                    postList.add(new Card(title,description));
+//                }
+//            }
+//        });
         LoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +112,8 @@ public class Login extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(Login.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                            //startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                            startActivity(new Intent(getApplicationContext(),MainActivity2.class));
                         }else {
                             Toast.makeText(Login.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
@@ -151,5 +183,58 @@ public class Login extends AppCompatActivity {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        welcome_note();
+    }
+
+
+    public void welcome_note(){
+
+        // Create an explicit intent for an Activity in your app
+        //Intent intent = new Intent(this, ScoreBoard.class);
+        //Intent intent = new Intent(this, Background.class);
+        Intent intent = new Intent(this, MainActivity2.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        createNotificationChannel();
+
+        // Build a notification object
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, TEST_CHANNEL_ID)
+                .setSmallIcon(R.drawable.done)
+                .setContentTitle("Click here to start map")
+                .setContentText("and launch Scoreboard")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(SMS_NOTI_ID, builder.build());
+
+    }
+
+    // Set up Test_channel notification channel
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "welcome_channel";
+            String description = "welcome_channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel( TEST_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

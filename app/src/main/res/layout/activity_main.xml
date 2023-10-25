@@ -25,13 +25,12 @@
         android:id="@+id/button_play_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499"
-        tools:text="Play Game" />
+        android:text="Play Game" />
 
     <Button
         android:id="@+id/log_out_button"
